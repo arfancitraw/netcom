@@ -1,0 +1,1774 @@
+{
+  "info": {
+    "_postman_id": "3c7ece66-54c8-41ef-afd3-5d0d2561f34c",
+    "name": "Netcom E-Commerce Platform API",
+    "description": "Production API collection for Netcom E-Commerce Analytics, Universal CRUD Data Engine, and RBAC Authentication system. Built with Python Flask, MySQL, JWT, Argon2id, and NumPy.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5000",
+      "type": "string",
+      "description": "Backend API base URL"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string",
+      "description": "JWT Bearer token automatically populated upon login"
+    },
+    {
+      "key": "admin_username",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "admin_password",
+      "value": "Admin@123",
+      "type": "string"
+    },
+    {
+      "key": "manager_username",
+      "value": "manager",
+      "type": "string"
+    },
+    {
+      "key": "manager_password",
+      "value": "Manager@123",
+      "type": "string"
+    },
+    {
+      "key": "viewer_username",
+      "value": "viewer",
+      "type": "string"
+    },
+    {
+      "key": "viewer_password",
+      "value": "Viewer@123",
+      "type": "string"
+    },
+    {
+      "key": "sample_order_id",
+      "value": "132f1e724165a07f6362532bfb97486e",
+      "type": "string"
+    },
+    {
+      "key": "sample_customer_id",
+      "value": "7ae2a9337aa4bc799723511faa1d6830",
+      "type": "string"
+    },
+    {
+      "key": "sample_product_id",
+      "value": "0082684bb4a60a862baaf7a60a5845ed",
+      "type": "string"
+    },
+    {
+      "key": "sample_seller_id",
+      "value": "8602a61d680a10a82cceeeda0d99ea3d",
+      "type": "string"
+    },
+    {
+      "key": "sample_review_id",
+      "value": "00041b1f51e77a663df6db3f539d694f",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. System & Health",
+      "description": "System health check and database connectivity verification endpoints.",
+      "item": [
+        {
+          "name": "System & Database Health Check",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "description": "Checks system operational status and database connection via SELECT 1 ping. Returns HTTP 200 if connected, HTTP 503 if degraded."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Database reports connected', function () {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.status).to.eql('healthy');",
+                  "    pm.expect(data.database).to.eql('connected');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication & RBAC",
+      "description": "JSON Web Token (JWT) authentication, Argon2id verification, and RBAC user management.",
+      "item": [
+        {
+          "name": "Login - Admin Role (Full Access)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{admin_username}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticates as Admin (`admin` / `Admin@123`). Automatically captures and sets the JWT token in `jwt_token` for subsequent requests."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();",
+                  "if (pm.response.code === 200 && responseData.success) {",
+                  "    var authData = responseData.data || {};",
+                  "    var token = authData.token;",
+                  "    if (token) {",
+                  "        pm.collectionVariables.set('jwt_token', token);",
+                  "        pm.test('Token received and stored in collection variable jwt_token', function () {",
+                  "            pm.expect(token).to.be.a('string').and.not.empty;",
+                  "        });",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response includes user role in data envelope', function () {",
+                  "    var user = (responseData.data && responseData.data.user) || {};",
+                  "    pm.expect(user).to.have.property('role');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Manager Role (CRUD Create/Edit)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{manager_username}}\",\n  \"password\": \"{{manager_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticates as Operations Manager (`manager` / `Manager@123`). Grants read/write permissions on CRUD datasets and order status updates, but denies user administration and record deletion."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();",
+                  "if (pm.response.code === 200 && responseData.success) {",
+                  "    var authData = responseData.data || {};",
+                  "    var token = authData.token;",
+                  "    if (token) {",
+                  "        pm.collectionVariables.set('jwt_token', token);",
+                  "        pm.test('Token received and stored in collection variable jwt_token', function () {",
+                  "            pm.expect(token).to.be.a('string').and.not.empty;",
+                  "        });",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response includes user role in data envelope', function () {",
+                  "    var user = (responseData.data && responseData.data.user) || {};",
+                  "    pm.expect(user).to.have.property('role');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Viewer Role (Read Only)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{viewer_username}}\",\n  \"password\": \"{{viewer_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticates as Viewer (`viewer` / `Viewer@123`). Read-only access to BI analytics and dataset inspection. Mutating actions (POST, PUT, PATCH, DELETE) will return HTTP 403 Forbidden."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();",
+                  "if (pm.response.code === 200 && responseData.success) {",
+                  "    var authData = responseData.data || {};",
+                  "    var token = authData.token;",
+                  "    if (token) {",
+                  "        pm.collectionVariables.set('jwt_token', token);",
+                  "        pm.test('Token received and stored in collection variable jwt_token', function () {",
+                  "            pm.expect(token).to.be.a('string').and.not.empty;",
+                  "        });",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response includes user role in data envelope', function () {",
+                  "    var user = (responseData.data && responseData.data.user) || {};",
+                  "    pm.expect(user).to.have.property('role');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Validates the active JWT Bearer token and returns authenticated claims (user_id, username, email, full_name, role)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List All System Users (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users"
+              ]
+            },
+            "description": "Returns all registered system accounts. Protected by RBAC: only users with role='admin' can execute this endpoint (returns HTTP 403 for manager/viewer)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Analytics & Business Intelligence",
+      "description": "Executive KPI aggregation, time-series revenue trends, Black Friday anomaly detection, and operational fulfillment queue.",
+      "item": [
+        {
+          "name": "Executive Overview (KPIs & Metrics)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/overview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "overview"
+              ]
+            },
+            "description": "Fetches macro KPIs across the platform: total revenue, order count, unique customers, product catalog size, seller network, average review score, status breakdown, and top revenue categories."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Daily Revenue - Peak Month (Nov 2017 Black Friday)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/daily-revenue?year=2017&month=11",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "daily-revenue"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2017",
+                  "description": "Calendar year filter"
+                },
+                {
+                  "key": "month",
+                  "value": "11",
+                  "description": "Calendar month filter (November 2017)"
+                }
+              ]
+            },
+            "description": "Retrieves daily revenue time-series and identifies peak day (Black Friday 2017-11-24: R$ 152,653.74 across 1,166 orders)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Daily Revenue - Annual Trend (2017 Full Year)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/daily-revenue?year=2017",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "daily-revenue"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2017",
+                  "description": "Full calendar year"
+                }
+              ]
+            },
+            "description": "Returns full 365-day aggregated revenue timeline for 2017 with 7-day moving averages and peak indicators."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Daily Revenue - Annual Trend (2018 Full Year)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/daily-revenue?year=2018",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "daily-revenue"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2018",
+                  "description": "Full calendar year 2018"
+                }
+              ]
+            },
+            "description": "Returns daily aggregated revenue timeline for 2018."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anomaly Detection - Z-Score (Black Friday Spike)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/anomalies?year=2017&method=zscore&threshold=2.5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "anomalies"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2017",
+                  "description": "Year to evaluate"
+                },
+                {
+                  "key": "method",
+                  "value": "zscore",
+                  "description": "Statistical anomaly algorithm ('zscore' or 'iqr')"
+                },
+                {
+                  "key": "threshold",
+                  "value": "2.5",
+                  "description": "Z-Score standard deviation multiplier"
+                }
+              ]
+            },
+            "description": "Executes NumPy statistical anomaly detection on daily sales volumes. Identifies Black Friday 2017-11-24 as an extreme positive spike (Z-Score > 6.0)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Anomalies array is populated', function () {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.anomalies).to.be.an('array');",
+                  "    pm.expect(data.anomalies.length).to.be.above(0);",
+                  "    pm.expect(data.anomalies[0].date).to.eql('2017-11-24');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anomaly Detection - IQR (Interquartile Range)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/anomalies?year=2017&method=iqr&threshold=1.5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "anomalies"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2017",
+                  "description": "Year to evaluate"
+                },
+                {
+                  "key": "method",
+                  "value": "iqr",
+                  "description": "IQR Tukey boxplot method"
+                },
+                {
+                  "key": "threshold",
+                  "value": "1.5",
+                  "description": "IQR multiplier (1.5 for mild outliers, 3.0 for extreme)"
+                }
+              ]
+            },
+            "description": "Executes IQR (Q3 + 1.5 * IQR) outlier detection across daily commerce metrics."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Operational Queue - Unshipped Orders (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/unshipped-orders?page=1&page_size=20&sort_by=order_purchase_timestamp&sort_order=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "unshipped-orders"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page index (1-based)"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20",
+                  "description": "Items per page (max 100)"
+                },
+                {
+                  "key": "sort_by",
+                  "value": "order_purchase_timestamp",
+                  "description": "Sorting column"
+                },
+                {
+                  "key": "sort_order",
+                  "value": "asc",
+                  "description": "asc or desc"
+                }
+              ]
+            },
+            "description": "Lists active orders awaiting fulfillment ('processing', 'invoiced', 'approved', 'created', 'unavailable') with calculated SLA status and estimated delivery dates."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Operational Queue - Filter by Status (Processing)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/unshipped-orders?page=1&page_size=20&status=processing",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "unshipped-orders"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page index"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20",
+                  "description": "Page size"
+                },
+                {
+                  "key": "status",
+                  "value": "processing",
+                  "description": "Order status filter"
+                }
+              ]
+            },
+            "description": "Filters operational fulfillment queue by specific order status."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Operational Queue - Search Orders (Customer / City / ID)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/unshipped-orders?search=sao paulo&page=1&page_size=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "unshipped-orders"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "sao paulo",
+                  "description": "Search keyword matching order ID, customer ID, or city"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page index"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20",
+                  "description": "Page size"
+                }
+              ]
+            },
+            "description": "Full-text search on unshipped orders by customer city, state, order ID, or customer ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response status indicates success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success !== false).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Order Status (Admin / Manager)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_status\": \"shipped\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/orders/{{sample_order_id}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "orders",
+                "{{sample_order_id}}",
+                "status"
+              ]
+            },
+            "description": "Updates an order's status (e.g. to 'shipped' or 'delivered'). When setting to 'shipped', order_delivered_carrier_date is automatically set to NOW(). Restricted to admin and manager roles."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200 OK or 404 (if ID was altered)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Universal CRUD Data Engine",
+      "description": "Complete REST API for all 9 platform datasets: Schema inspection, dynamic pagination, multi-column search, sorting, and full Create/Read/Update/Delete operations.",
+      "item": [
+        {
+          "name": "1. Catalog & Schema",
+          "item": [
+            {
+              "name": "List All 9 Datasets",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/datasets",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "datasets"
+                  ]
+                },
+                "description": "Returns metadata, record counts, and primary key definitions for all 9 datasets supported by the CRUD engine."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status is 200 OK', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test('Returns all 9 datasets', function () {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data.length).to.eql(9);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Dataset Schema - Customers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/schema/customers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "schema",
+                    "customers"
+                  ]
+                },
+                "description": "Inspects database table schema: column names, data types, nullability, defaults, and primary key constraints."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test('Response status indicates success', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success !== false).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Dataset Schema - Orders",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/schema/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "schema",
+                    "orders"
+                  ]
+                },
+                "description": "Inspects orders table column metadata and constraints."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test('Response status indicates success', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success !== false).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Dataset Schema - Order Items (Composite PK)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/schema/order_items",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "schema",
+                    "order_items"
+                  ]
+                },
+                "description": "Inspects order_items composite primary key schema (`order_id`, `order_item_id`)."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test('Response status indicates success', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success !== false).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2. Generic CRUD Operations",
+          "item": [
+            {
+              "name": "List Records (Paginated & Filtered)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/customers?page=1&per_page=20&search=sao paulo&sort_by=customer_city&sort_order=asc",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "customers"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (1-based)"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "20",
+                      "description": "Records per page (5-100)"
+                    },
+                    {
+                      "key": "search",
+                      "value": "sao paulo",
+                      "description": "Search keyword filtered across index columns"
+                    },
+                    {
+                      "key": "sort_by",
+                      "value": "customer_city",
+                      "description": "Field to sort by"
+                    },
+                    {
+                      "key": "sort_order",
+                      "value": "asc",
+                      "description": "Sort direction ('asc' or 'desc')"
+                    }
+                  ]
+                },
+                "description": "Universal pagination, sorting, and multi-column search across any dataset."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test('Response status indicates success', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success !== false).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Single Record by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/customers/{{sample_customer_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "customers",
+                    "{{sample_customer_id}}"
+                  ]
+                },
+                "description": "Fetches a single record by its primary key."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test('Response status indicates success', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success !== false).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Record (Admin / Manager)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"product_category_name\": \"teste_api_automation\",\n  \"product_category_name_english\": \"api_automation_test\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/product_category_translation",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "product_category_translation"
+                  ]
+                },
+                "description": "Inserts a new record into any dataset. Restricted to admin and manager roles."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status is 201 Created or 400 (Duplicate)', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Record (Admin / Manager)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"product_category_name_english\": \"updated_automation_test\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/product_category_translation/teste_api_automation",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "product_category_translation",
+                    "teste_api_automation"
+                  ]
+                },
+                "description": "Updates non-primary-key attributes of an existing record. Restricted to admin and manager roles."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status is 200 OK or 400', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Record (Admin Only)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/product_category_translation/teste_api_automation",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "product_category_translation",
+                    "teste_api_automation"
+                  ]
+                },
+                "description": "Deletes a record by its primary key. Highly restricted RBAC: only 'admin' role can delete records."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status is 200 OK or 400', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "3. Individual Dataset Quick Access",
+          "item": [
+            {
+              "name": "1. Customers (99,441 records)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/customers?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "customers"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "2. Orders (99,441 records)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/orders?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "orders"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "3. Order Items (112,650 items)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/order_items?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "order_items"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "3a. Order Items - Get Composite PK (order_id/order_item_id)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/order_items/e5fa5a7210941f7d56d0208e4e071d35/1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "order_items",
+                    "e5fa5a7210941f7d56d0208e4e071d35",
+                    "1"
+                  ]
+                },
+                "description": "Fetches a line item using composite primary key path: `/api/crud/order_items/{order_id}/{order_item_id}`."
+              }
+            },
+            {
+              "name": "4. Order Payments (103,886 records)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/order_payments?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "order_payments"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "4a. Order Payments - Get Composite PK (order_id/payment_seq)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/order_payments/00048cc3ae777c65dbb7d2a0634bc1ea/1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "order_payments",
+                    "00048cc3ae777c65dbb7d2a0634bc1ea",
+                    "1"
+                  ]
+                },
+                "description": "Fetches payment slice using composite primary key path: `/api/crud/order_payments/{order_id}/{payment_sequential}`."
+              }
+            },
+            {
+              "name": "5. Order Reviews (99,224 reviews)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/order_reviews?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "order_reviews"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "6. Products Catalog (32,951 products)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/products?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "7. Sellers Network (3,095 sellers)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/sellers?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "sellers"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "8. Geolocation (1,000,163 zip codes)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/geolocation?page=1&per_page=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "geolocation"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "9. Category Translations (71 categories)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/crud/product_category_translation?page=1&per_page=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "crud",
+                    "product_category_translation"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "20"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
