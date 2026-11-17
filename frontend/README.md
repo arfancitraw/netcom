@@ -1,6 +1,6 @@
-# Netcom Analytics - Frontend
+# Netcom Analytics — Frontend
 
-Web client for the Netcom E-Commerce intelligence and operational analytics platform.
+Aplikasi web client untuk platform analitik operasional dan intelijen bisnis Netcom E-Commerce.
 
 ## Tech Stack
 - React 19
@@ -9,16 +9,16 @@ Web client for the Netcom E-Commerce intelligence and operational analytics plat
 - Chart.js & react-chartjs-2
 - Lucide React
 
-## Development
+## Panduan Pengembangan (Development)
 ```bash
 npm install
 npm run dev
 ```
 
-Runs on `http://localhost:3000`. Proxies API requests to the Flask backend on `http://127.0.0.1:5000`.
+Aplikasi berjalan pada `http://localhost:3000` dan secara otomatis meneruskan (*proxy*) permintaan API ke backend Flask di `http://127.0.0.1:5000`.
 
 ## Production Build
 ```bash
 npm run build
 ```
-Outputs static assets into `dist/`.
+Menghasilkan berkas aset statis produksi di dalam direktori `dist/`.

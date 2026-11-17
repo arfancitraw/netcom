@@ -1,141 +1,141 @@
-# Netcom Analytics — Brazilian E-Commerce Platform
+# Netcom Analytics — Platform Intelijen E-Commerce Brasil
 
-A full-stack analytics platform, operational dashboard, and relational data engine built for high-volume Brazilian e-commerce transaction data (1.45 million records across 9 relational tables).
+Platform analitik *full-stack*, dasbor operasional, dan mesin data relasional berkinerja tinggi yang dibangun untuk mengolah transaksi e-commerce Brasil dalam skala besar (1,45 juta baris data pada 9 entitas relasional).
 
-![Entity-Relationship Diagram](erd.png)
-
----
-
-## Overview
-
-The platform provides fast relational querying, time-series revenue tracking, statistical anomaly detection, operational fulfillment queues, and dynamic CRUD management. It is designed to handle high transaction density with clean architecture, strict database constraints, connection pooling, and role-based access control.
-
-### Technology Stack
-* **Backend:** Python 3, Flask RESTful API, PyMySQL connection pooling with `DBUtils`, Argon2 password hashing, PyJWT authentication, NumPy/SciPy statistical engines.
-* **Database:** MySQL 8.0 (InnoDB engine, UTF8MB4 charset, composite primary keys, foreign key constraints, B-Tree indexed search columns).
-* **Frontend:** React 19, Vite 8, Tailwind CSS, Chart.js & react-chartjs-2, Lucide icons.
-* **Security:** JWT bearer tokens, Argon2 password hashing, RBAC permission middleware (`admin`, `manager`, `viewer`).
+![Diagram Relasi Entitas](erd.png)
 
 ---
 
-## Repository Structure
+## Ringkasan Proyek
+
+Platform ini dirancang untuk mengeksekusi *query* relasional berkecepatan tinggi, pelacakan pendapatan berbasis runtun waktu (*time series*), deteksi anomali statistik, pemantauan antrean pemenuhan pesanan (*fulfillment queue*), dan manajemen data CRUD dinamis. Arsitekturnya mengedepankan modularitas yang bersih, penegakan integritas data yang ketat pada level basis data, manajemen *connection pooling*, serta kontrol akses berbasis peran (*Role-Based Access Control* / RBAC).
+
+### Tech Stack
+* **Backend:** Python 3, Flask RESTful API, PyMySQL dengan *connection pooling* `DBUtils`, *hashing* kata sandi Argon2, autentikasi PyJWT, serta pustaka kalkulasi statistik NumPy dan SciPy.
+* **Basis Data:** MySQL 8.0 (*engine* InnoDB, *charset* UTF8MB4, *composite primary key*, batasan *foreign key*, dan kolom pencarian terindeks B-Tree).
+* **Frontend:** React 19, Vite 8, Tailwind CSS, Chart.js & react-chartjs-2, serta ikon antarmuka Lucide.
+* **Keamanan & Tata Kelola:** Token JWT Bearer, enkripsi Argon2, dan *middleware* proteksi hak akses peran (`admin`, `manager`, `viewer`).
+
+---
+
+## Struktur Repositori
 
 ```text
 netcom/
 ├── backend/
-│   ├── analytics/              # Revenue, anomaly detection, and fulfillment routes
-│   ├── auth/                   # JWT authentication, Argon2 hashing, and RBAC routes
-│   ├── crud/                   # Universal schema introspection and CRUD endpoints
-│   ├── app.py                  # Flask application factory and blueprint registration
-│   ├── config.py               # Environment configuration loader
-│   ├── db.py                   # PooledDB connection management and query helpers
-│   ├── init_db.py              # Database schema initializer and CSV ingestion runner
-│   ├── test_api.py             # Automated 10-point test suite for API verification
-│   ├── requirements.txt        # Backend Python dependencies
-│   ├── .env.example            # Sample environment variables
-│   └── netcom_api_collection.postman_collection.json # Postman v2.1.0 collection
-├── dataset_technical_test_netcom/ # Source CSV datasets
+│   ├── analytics/              # Rute analitik omzet, deteksi anomali, dan pemenuhan pesanan
+│   ├── auth/                   # Autentikasi JWT, hashing Argon2, dan penegakan RBAC
+│   ├── crud/                   # Introspeksi skema universal dan endpoint operasi CRUD
+│   ├── app.py                  # Factory aplikasi Flask dan registrasi blueprint
+│   ├── config.py               # Pengelola konfigurasi variabel lingkungan
+│   ├── db.py                   # Manajemen connection pool PooledDB dan helper query
+│   ├── init_db.py              # Inisialisasi skema basis data dan skrip migrasi CSV
+│   ├── test_api.py             # Rangkaian pengujian otomatis (10 pengujian end-to-end)
+│   ├── requirements.txt        # Daftar dependensi Python backend
+│   ├── .env.example            # Templat konfigurasi variabel lingkungan
+│   └── netcom_api_collection.postman_collection.json # Koleksi pengujian Postman v2.1.0
+├── dataset_technical_test_netcom/ # Berkas dataset mentah format CSV
 ├── frontend/
 │   ├── src/
-│   │   ├── components/         # Reusable UI (Navbar, Sidebar, Skeleton, EmptyState)
-│   │   ├── context/            # AuthContext (JWT management, user state)
-│   │   ├── pages/              # Overview, Daily Revenue, Anomalies, Orders, CRUD, Architecture
-│   │   ├── api.js              # Axios HTTP client with request/response interceptors
-│   │   └── App.jsx             # Main router and authenticated layout shell
-│   ├── index.html              # HTML entrypoint
-│   ├── package.json            # Node dependencies and build scripts
-│   └── vite.config.js          # Vite config with backend proxy setup
-├── erd.png                     # High-resolution Entity-Relationship Diagram (300 DPI)
-├── netcom_ecommerce_dump.sql.gz # Compressed database dump with 1.45M records (39.4 MB)
-├── schema.sql                  # DDL statements and foreign key constraints
-└── README.md                   # System documentation and operational runbook
+│   │   ├── components/         # Komponen UI modular (Navbar, Sidebar, Skeleton, EmptyState)
+│   │   ├── context/            # AuthContext (state pengguna dan token JWT)
+│   │   ├── pages/              # Halaman Overview, Revenue, Anomalies, Orders, CRUD, Architecture
+│   │   ├── api.js              # Klien HTTP Axios dengan interceptor token otomatis
+│   │   └── App.jsx             # Router aplikasi dan layout shell terproteksi
+│   ├── index.html              # Titik masuk HTML aplikasi web
+│   ├── package.json            # Konfigurasi dependensi dan skrip eksekusi frontend
+│   └── vite.config.js          # Konfigurasi bundler Vite dan reverse proxy backend
+├── erd.png                     # Diagram Relasi Entitas (ERD) resolusi tinggi (300 DPI)
+├── netcom_ecommerce_dump.sql.gz # Berkas dump database terkompresi (1,45 juta baris, 39.4 MB)
+├── schema.sql                  # Definisi skema DDL dan konstrain foreign key
+└── README.md                   # Dokumentasi sistem dan buku panduan operasional
 ```
 
 ---
 
-## Core Capabilities & Deliverables
+## Fitur Utama & Hasil Pengerjaan
 
-| Module / Requirement | Description | Location |
+| Modul / Kebutuhan | Deskripsi Implementasi | Lokasi Berkas |
 | :--- | :--- | :--- |
-| **Universal CRUD Engine** | Full Create, Read, Update, Delete with search, pagination, and sorting across all 9 dataset tables | [frontend/src/pages/CrudManager.jsx](frontend/src/pages/CrudManager.jsx)<br>[backend/crud/routes.py](backend/crud/routes.py) |
-| **Authentication & RBAC** | Secure role-based login (Admin, Manager, Viewer) with Argon2 hashing and JWT tokens | [frontend/src/pages/Login.jsx](frontend/src/pages/Login.jsx)<br>[backend/auth/routes.py](backend/auth/routes.py) |
-| **Daily Revenue Analytics** | Time-series daily revenue breakdown filtered by month and year with dual-axis volume correlation | [frontend/src/pages/RevenueAnalytics.jsx](frontend/src/pages/RevenueAnalytics.jsx)<br>[backend/analytics/routes.py](backend/analytics/routes.py) |
-| **Statistical Anomaly Detection** | Parametric (Z-Score) & non-parametric (IQR) outlier detection highlighting demand shocks (e.g., Black Friday 2017) | [frontend/src/pages/AnomalyDetection.jsx](frontend/src/pages/AnomalyDetection.jsx)<br>[backend/analytics/routes.py](backend/analytics/routes.py) |
-| **Fulfillment & Unshipped Orders** | Operational backlog queue tracking unshipped orders with delivery SLA latency warnings | [frontend/src/pages/UnshippedOrders.jsx](frontend/src/pages/UnshippedOrders.jsx)<br>[backend/analytics/routes.py](backend/analytics/routes.py) |
-| **Entity-Relationship Diagram** | Normalized 9-entity relational topology with central order lifecycle hub (300 DPI) | [erd.png](erd.png) |
-| **Complete Database Dump** | MySQL database dump containing complete DDL schema, indexes, and all 1,450,927 rows | [netcom_ecommerce_dump.sql.gz](netcom_ecommerce_dump.sql.gz) |
-| **100x Scaling Architecture** | Multi-tier scaling blueprint (partitioning, Redis caching, ClickHouse OLAP, Kafka CDC) | [README.md #scaling-strategy](#100x-scaling-strategy-150m-records) & UI |
+| **Mesin CRUD Universal** | Operasi Create, Read, Update, Delete penuh dengan pencarian, paginasi, dan pengurutan pada 9 tabel | [frontend/src/pages/CrudManager.jsx](frontend/src/pages/CrudManager.jsx)<br>[backend/crud/routes.py](backend/crud/routes.py) |
+| **Autentikasi & RBAC** | Sistem login aman berbasis peran (Admin, Manager, Viewer) menggunakan enkripsi Argon2 dan token JWT | [frontend/src/pages/Login.jsx](frontend/src/pages/Login.jsx)<br>[backend/auth/routes.py](backend/auth/routes.py) |
+| **Analitik Pendapatan Harian** | Runtun waktu pendapatan harian dengan filter bulan dan tahun serta visualisasi korelasi volume pesanan sumbu ganda | [frontend/src/pages/RevenueAnalytics.jsx](frontend/src/pages/RevenueAnalytics.jsx)<br>[backend/analytics/routes.py](backend/analytics/routes.py) |
+| **Deteksi Anomali Statistik** | Deteksi lonjakan ekstrem parametrik (Z-Score) & non-parametrik (IQR) yang menyorot peristiwa Black Friday 2017 | [frontend/src/pages/AnomalyDetection.jsx](frontend/src/pages/AnomalyDetection.jsx)<br>[backend/analytics/routes.py](backend/analytics/routes.py) |
+| **Antrean Pesanan Belum Terkirim** | Dasbor operasional pemantauan pesanan pending yang dilengkapi indikator urgensi kepatuhan batas waktu pengiriman (SLA) | [frontend/src/pages/UnshippedOrders.jsx](frontend/src/pages/UnshippedOrders.jsx)<br>[backend/analytics/routes.py](backend/analytics/routes.py) |
+| **Diagram Relasi Entitas (ERD)** | Pemodelan relasional 9 entitas yang dinormalisasi dengan tabel pesanan (*orders*) sebagai pusat transaksi (300 DPI) | [erd.png](erd.png) |
+| **Database Dump Lengkap** | Berkas dump MySQL yang memuat skema DDL, indeks teroptimasi, serta seluruh 1.450.927 data transaksi | [netcom_ecommerce_dump.sql.gz](netcom_ecommerce_dump.sql.gz) |
+| **Arsitektur Skalabilitas 100x** | Cetak biru arsitektur penskalaan (partisi data, *caching* Redis, mesin analitik ClickHouse OLAP, dan CDC Kafka) | Bagian [Strategi Skalabilitas](#strategi-skalabilitas-100x-150-juta-data) & Dasbor |
 
 ---
 
-## Database Architecture & Ingestion
+## Arsitektur Basis Data & Pemodelan Data
 
-### Schema Topology
-* **Central Hub (`orders`):** Connects to `order_items`, `order_payments`, and `order_reviews` via `order_id`.
-* **Customers & Sellers:** `orders.customer_id` &rarr; `customers.customer_id`; `order_items.seller_id` &rarr; `sellers.seller_id`.
-* **Catalog & Categories:** `order_items.product_id` &rarr; `products.product_id`; `products.product_category_name` &rarr; `product_category_translation.product_category_name`.
-* **Spatial Mapping:** `customers.customer_zip_code_prefix` and `sellers.seller_zip_code_prefix` map to `geolocation.geolocation_zip_code_prefix`.
-* **Isolated Auth Entity:** The `users` table is strictly segregated from transaction workflows for administrative security.
+### Topologi Relasi Antar Tabel
+* **Pusat Transaksi (`orders`):** Menghubungkan entitas anak `order_items`, `order_payments`, dan `order_reviews` melalui relasi satu-ke-banyak (1:N) dengan *foreign key* `order_id`.
+* **Pelanggan & Merchant:** Menghubungkan `orders.customer_id` &rarr; `customers.customer_id` serta `order_items.seller_id` &rarr; `sellers.seller_id`.
+* **Katalog & Kategori Produk:** Menghubungkan `order_items.product_id` &rarr; `products.product_id` serta nama kategori `products.product_category_name` &rarr; `product_category_translation.product_category_name`.
+* **Pemetaan Geospasial:** Kolom `customer_zip_code_prefix` dan `seller_zip_code_prefix` terhubung ke data koordinat `geolocation.geolocation_zip_code_prefix`.
+* **Isolasi Entitas Autentikasi:** Tabel `users` dipisahkan secara ketat dari alur transaksi komersial guna menjamin integritas dan keamanan administratif dasbor.
 
-### Verified Ingested Records
+### Verifikasi Data yang Dimuat ke Basis Data
 
-| Table Name | Ingested Rows | Primary Key | Foreign Key References | Description |
+| Nama Tabel | Jumlah Data | Primary Key | Relasi Foreign Key | Keterangan Data |
 | :--- | :---: | :--- | :--- | :--- |
-| `users` | **3** | `id` (AUTO_INCREMENT) | None (Isolated) | Dashboard users & RBAC roles |
-| `product_category_translation` | **73** | `product_category_name` | None | Category translation (PT &rarr; EN) |
-| `customers` | **99,441** | `customer_id` | `customer_zip_code_prefix` | Unique customer profiles and locations |
-| `sellers` | **3,095** | `seller_id` | `seller_zip_code_prefix` | Merchant directory and locations |
-| `products` | **32,951** | `product_id` | `product_category_name` | Product dimensions, weights, and categories |
-| `orders` | **99,441** | `order_id` | `customer_id` | Order lifecycle and status milestones |
-| `order_items` | **112,650** | `(order_id, order_item_id)` | `order_id`, `product_id`, `seller_id` | Item-level prices and freight charges |
-| `order_payments` | **103,886** | `(order_id, payment_sequential)` | `order_id` | Payment types, installments, and values |
-| `order_reviews` | **99,224** | `review_id` | `order_id` | Review ratings (1-5) and customer comments |
-| `geolocation` | **1,000,163** | `geolocation_id` (AUTO_INCREMENT) | Referenced by zip prefix | GPS coordinates, cities, and states |
-| **Total Ingested** | **1,450,927** | — | — | **100% Relational Integrity** |
+| `users` | **3** | `id` (AUTO_INCREMENT) | Tidak ada (Terisolasi) | Pengguna dasbor dan hak akses peran |
+| `product_category_translation` | **73** | `product_category_name` | Tidak ada | Terjemahan kategori produk (Portugis &rarr; Inggris) |
+| `customers` | **99.441** | `customer_id` | `customer_zip_code_prefix` | Identitas unik pembeli dan lokasi domisili |
+| `sellers` | **3.095** | `seller_id` | `seller_zip_code_prefix` | Direktori mitra penjual (*merchants*) dan wilayah asal |
+| `products` | **32.951** | `product_id` | `product_category_name` | Dimensi fisik produk, berat, foto, dan kategori |
+| `orders` | **99.441** | `order_id` | `customer_id` | Siklus status pesanan dan catatan waktu pemrosesan |
+| `order_items` | **112.650** | `(order_id, order_item_id)` | `order_id`, `product_id`, `seller_id` | Rincian barang pesanan, harga jual, dan tarif ongkos kirim |
+| `order_payments` | **103.886** | `(order_id, payment_sequential)` | `order_id` | Transaksi tender (kartu kredit, boleto, voucher, debit) |
+| `order_reviews` | **99.224** | `review_id` | `order_id` | Skor kepuasan pelanggan (1-5 bintang) dan ulasan teks |
+| `geolocation` | **1.000.163** | `geolocation_id` (AUTO_INCREMENT) | Dirujuk oleh awalan kode pos | Data koordinat GPS lintang/bujur, kota, dan negara bagian |
+| **Total Baris Data** | **1.450.927** | — | — | **100% Integritas Relasional Terverifikasi** |
 
 ---
 
-## Feature Implementations
+## Implementasi Fitur
 
-### 1. Universal CRUD Engine
-* **Dynamic Reflection:** Reads table metadata from `INFORMATION_SCHEMA.COLUMNS` to automatically construct table views, validation constraints, and form inputs.
-* **Composite Primary Key Support:** Correctly handles multi-column keys in tables like `order_items` (`order_id`, `order_item_id`) and `order_payments` (`order_id`, `payment_sequential`).
-* **Server-Side Pagination & Filtering:** Handles high table density with `LIMIT / OFFSET`, column-specific sorting (`ORDER BY`), and multi-column fuzzy search (`LIKE`).
+### 1. Mesin CRUD Universal
+* **Introspeksi Skema Dinamis:** Backend secara otomatis membaca metadata tabel dari `INFORMATION_SCHEMA.COLUMNS` untuk merender struktur form, tipe input, validasi, dan kolom data secara dinamis.
+* **Dukungan Kunci Primer Majemuk (*Composite Primary Key*):** Menangani relasi multi-kunci secara tepat pada tabel seperti `order_items` (`order_id`, `order_item_id`) dan `order_payments` (`order_id`, `payment_sequential`).
+* **Paginasi & Pencarian Sisi Server:** Mengoptimalkan performa tabel data besar dengan paginasi `LIMIT / OFFSET`, pengurutan kolom instan (`ORDER BY`), serta pencarian multibaris berbasis `LIKE`.
 
-### 2. Daily Revenue Analytics
-* **Calendar Filtering:** Select by year (2016, 2017, 2018, or All) and month (Jan–Dec, or All Months).
-* **Dual-Axis Chart:** Visualizes daily merchandise revenue (R$) alongside daily order counts.
-* **Financial Ledger:** Detailed daily ledger reporting merchandise revenue, freight revenue, gross revenue, items sold, and average order value (AOV) with CSV export.
+### 2. Analitik Pendapatan Harian
+* **Filter Waktu Interaktif:** Pilihan penelusuran fleksibel berdasarkan tahun (2016, 2017, 2018, atau Seluruh Tahun) dan bulan (Januari s.d. Desember, atau Seluruh Bulan).
+* **Grafik Visual Sumbu Ganda (*Dual-Axis Chart*):** Memvisualisasikan total omzet penjualan harian (dalam mata uang Real Brasil / R$) berdampingan dengan kurva volume transaksi pesanan.
+* **Buku Kas Harian (*Financial Ledger*):** Tabel rincian harian yang mencakup omzet barang, biaya ongkir, pendapatan kotor, jumlah unit terjual, dan nilai rata-rata pesanan (*Average Order Value* / AOV) yang dapat diekspor ke CSV dalam sekali klik.
 
-### 3. Statistical Anomaly Detection
-* **Z-Score Engine (Parametric):** Calculates daily deviation relative to historical rolling mean and standard deviation ($Z = \frac{x - \mu}{\sigma}$). Threshold is user-configurable from $2.0\sigma$ to $3.5\sigma$.
-* **IQR Boxplot Engine (Non-Parametric):** Robust against skewness using upper quartile thresholds ($Q_3 + 1.5 \times IQR$).
-* **Black Friday 2017 Detection:** Automatically identifies **2017-11-24** as the all-time peak trading day (R\$ 152,653.74 across 1,166 orders, Z-score **+12.13**, $+10.44\sigma$ surge above mean), alongside the carry-over weekend spike on 2017-11-25.
+### 3. Deteksi Anomali Statistik
+* **Mesin Z-Score (Pendekatan Parametrik):** Mengukur deviasi omzet harian terhadap nilai rata-rata bergulir dan standar deviasi ($Z = \frac{x - \mu}{\sigma}$). Nilai ambang batas (*threshold*) dapat disesuaikan pengguna dari $2,0\sigma$ hingga $3,5\sigma$.
+* **Mesin IQR Boxplot (Pendekatan Non-Parametrik):** Kuat terhadap kemiringan distribusi data (*skewness*) dengan menggunakan ambang kuartil atas ($Q_3 + 1,5 \times IQR$).
+* **Identifikasi Black Friday 2017:** Secara presisi menandai tanggal **24 November 2017** sebagai hari rekor penjualan tertinggi sepanjang sejarah data (omzet R\$ 152.653,74 dengan 1.166 pesanan, lonjakan Z-Score **+12,13**, atau $+10,44\sigma$ di atas rata-rata), diikuti lonjakan bawaan pada akhir pekan tanggal 25 November 2017.
 
-### 4. Fulfillment & Unshipped Orders
-* **Queue Scope:** Monitors all active orders pending shipment (`invoiced`, `processing`, `created`, `approved`, `unavailable` — 1,233 orders).
-* **SLA Tracking:** Computes real-time fulfillment latency against `order_estimated_delivery_date` (`Within SLA`, `Normal`, `Urgent`).
-* **Inline Lifecycle Transitions:** Allows authorized roles to advance orders (`Mark Shipped`, `Mark Delivered`, `Cancel Order`) with immediate UI update.
+### 4. Manajemen Pemenuhan Pesanan Belum Terkirim
+* **Cakupan Pengawasan:** Melacak seluruh pesanan aktif yang belum selesai dikirim ke pelanggan (`invoiced`, `processing`, `created`, `approved`, `unavailable` — total 1.233 pesanan).
+* **Pengawasan Batas Waktu SLA:** Menghitung sisa waktu pengiriman terhadap tanggal estimasi (`order_estimated_delivery_date`) dengan indikator warna status (`Dalam SLA`, `Normal`, `Mendesak/Terlambat`).
+* **Pembaruan Status Cepat:** Memberikan wewenang kepada peran Admin dan Manager untuk mengubah status alur pesanan (`Mark Shipped`, `Mark Delivered`, `Cancel Order`) dengan pembaruan antarmuka secara *real-time*.
 
 ---
 
-## 100x Scaling Strategy (150M+ Records)
+## Strategi Skalabilitas 100x (150 Juta+ Data)
 
-When scaling from 1.45 million records to **150 million+ records** with thousands of concurrent users, a single monolithic database tier faces table lock contention, deep B-Tree traversal times, I/O saturation, and connection exhaustion. 
+Ketika volume transaksi bertumbuh dari 1,45 juta data menjadi **150 juta data lebih** dengan ribuan pengguna konkuren, basis data relasional monolitik tunggal akan mengalami kemacetan parah pada *table lock*, kedalaman indeks B-Tree, saturasi I/O disk, dan kehabisan alokasi *connection pool*.
 
-The architecture below outlines the strategy to sustain sub-100ms response times and 99.99% availability:
+Arsitektur bertingkat berikut diterapkan guna mempertahankan waktu respons di bawah 100 milidetik dengan tingkat ketersediaan 99,99%:
 
 ```text
                           ┌──────────────────────────┐
-                          │   Global Edge CDN        │
+                          │     Edge CDN Global      │
                           │ Cloudflare / CloudFront  │
-                          │ (Static Assets & API)    │
+                          │  (Aset Statis & Cache)   │
                           └─────────────┬────────────┘
                                         │
                                         ▼
                           ┌──────────────────────────┐
                           │    ALB / Nginx Proxy     │
-                          │  Rate Limiting & SSL     │
+                          │   Rate Limiting & SSL    │
                           └─────────────┬────────────┘
                                         │
                     ┌───────────────────┴───────────────────┐
@@ -143,15 +143,15 @@ The architecture below outlines the strategy to sustain sub-100ms response times
                     ▼                                       ▼
       ┌──────────────────────────┐            ┌──────────────────────────┐
       │  App Pod 1 (FastAPI/Py)  │            │  App Pod N (FastAPI/Py)  │
-      │  Horizontal Auto-Scaled  │            │  Horizontal Auto-Scaled  │
+      │   Horizontal Autoscaling │            │   Horizontal Autoscaling │
       └─────────────┬────────────┘            └─────────────┬────────────┘
                     │                                       │
                     ├───────────────────┬───────────────────┤
                     │                   │                   │
                     ▼                   ▼                   ▼
       ┌──────────────────────────┐┌───────────┐┌──────────────────────────┐
-      │      Redis Cluster       ││ ProxySQL  ││    Kafka + Debezium CDC  │
-      │   In-Memory Cache & Lock ││ Multiplex ││    Change Data Capture   │
+      │      Redis Cluster       ││ ProxySQL  ││   Kafka + Debezium CDC   │
+      │   In-Memory Cache & Lock ││Multiplexing││  Change Data Capture    │
       └──────────────────────────┘└─────┬─────┘└────────────┬─────────────┘
                                         │                   │
                   ┌─────────────────────┴───────┐           │
@@ -159,57 +159,57 @@ The architecture below outlines the strategy to sustain sub-100ms response times
                   ▼                             ▼           ▼
       ┌──────────────────────────┐┌───────────────────────┐┌──────────────┐
       │ Primary MySQL (OLTP)     ││ Read Replica Cluster  ││ ClickHouse   │
-      │ Range Partitioned by Year││ (1:3 Multi-AZ Nodes)  ││ (OLAP Engine)│
+      │ Partisi Rentang per Tahun││ (1:3 Node Multi-AZ)   ││ (Mesin OLAP) │
       └──────────────────────────┘└───────────────────────┘└──────────────┘
 ```
 
-### 1. Database Partitioning & Read Replicas
-* **Range Partitioning by Timestamp:** Partition `orders` and `order_items` by `YEAR(order_purchase_timestamp)` and `MONTH`. MySQL query pruning scans only the specific target month partition, reducing disk lookups from 150M rows down to ~1.2M rows.
-* **Read/Write Splitting with ProxySQL:** Deploy 1 Primary Writer with 3 Read Replicas. ProxySQL directs transactional writes to the primary node and routes analytical queries across read replicas.
-* **Connection Multiplexing:** `PooledDB` and ProxySQL multiplex client connections, keeping active DB threads capped at ~200 while safely serving 10,000+ concurrent clients.
+### 1. Partisi Basis Data & Replikasi Baca (Read Replicas)
+* **Partisi Rentang Berdasarkan Waktu (*Range Partitioning*):** Mempartisi tabel transaksi `orders` dan `order_items` berdasarkan fungsi `YEAR(order_purchase_timestamp)` dan `MONTH`. Mekanisme *query pruning* pada MySQL hanya akan membaca partisi bulan target yang relevan, memangkas pemindaian baris dari 150 juta menjadi hanya ~1,2 juta baris data.
+* **Pemisahan Jalur Baca & Tulis (*Read/Write Splitting*):** Memasang ProxySQL di depan 1 Master Primary Writer dan 3 Read Replicas. Perintah mutasi (`INSERT`, `UPDATE`, `DELETE`) diarahkan ke Master, sementara seluruh *query* analitik yang intensif diarahkan ke Read Replicas.
+* **Multiplexing Koneksi Basis Data:** Menggunakan pustaka `PooledDB` dan ProxySQL untuk melakukan multiplexing koneksi, menjaga *active thread* basis data tetap stabil di kisaran ~200 koneksi meskipun melayani 10.000+ pengguna simultan.
 
-### 2. In-Memory Caching Tier (Redis Cluster)
-* **Pre-Computed Daily Revenue Rollups:** Daily financial aggregates are cached in Redis (`rev:daily:YYYY-MM`). Historical months are cached permanently, while current month data uses a 3-minute TTL with cache-aside invalidation.
-* **Sub-Millisecond Token Verification:** Active JWT tokens and role privileges are validated against Redis in under 0.5ms.
-* **Sliding-Window Rate Limiting:** Redis Lua scripts enforce a 100 req/min rate limit per IP to protect analytics endpoints.
+### 2. Lapisan Caching Dalam Memori (Redis Cluster)
+* **Pre-Agregasi Ringkasan Finansial Harian:** Nilai omzet dan anomali harian disimpan di Redis dengan format kunci `rev:daily:YYYY-MM`. Data bulan-bulan yang telah lewat di-*cache* secara permanen, sementara data bulan berjalan memiliki TTL 3 menit dengan pola pembaharuan *cache-aside*.
+* **Validasi Token Instan:** Metadata sesi dan daftar pembatalan token JWT divalidasi langsung melalui Redis dalam waktu kurang dari 0,5 milidetik per request.
+* **Pembatasan Laju Akses (*Sliding-Window Rate Limiting*):** Script Lua di Redis membatasi akses request per alamat IP (100 req/menit) untuk mencegah serangan bot dan scraping berlebih.
 
-### 3. Columnar OLAP Engine (ClickHouse / BigQuery)
-* **Separation of OLTP and OLAP:** Real-time transactional mutations (CRUD, order status updates) stay on MySQL. Row changes are streamed from MySQL binlogs via **Debezium CDC** into **Apache Kafka**.
-* **Vectorized Analytical Execution:** Kafka loads data into **ClickHouse**. With LZ4 columnar compression and vectorized execution, ClickHouse computes Z-scores across 150M records in **under 80ms** (compared to ~45 seconds on standard row-oriented MySQL).
+### 3. Mesin Analitik Kolumnar (ClickHouse / BigQuery)
+* **Pemisahan Beban OLTP dan OLAP:** Beban transaksi harian ACID tetap ditangani MySQL. Setiap perubahan data ditangkap secara *real-time* dari binlog MySQL menggunakan **Debezium CDC** dan dialirkan melalui **Apache Kafka**.
+* **Eksekusi Analitik Vektorisasi:** Data dari Kafka diserap oleh **ClickHouse**. Dengan penyimpanan berbasis kolom (*columnar storage*) dan kompresi LZ4, ClickHouse dapat menghitung kalkulasi Z-Score di atas 150 juta baris data dalam tempo **kurang dari 80 milidetik** (dibandingkan ~45 detik pada MySQL berbasis baris standar).
 
-### 4. Spatial Geolocation Pre-Aggregation
-* In the raw dataset, `geolocation` contains 1,000,163 GPS records for ~19,000 zip code prefixes.
-* *Optimization:* Create a materialized table `geolocation_centroids` grouping by `geolocation_zip_code_prefix` and computing `AVG(latitude)` and `AVG(longitude)`. This compresses 1,000,000 rows to 19,015 indexed points, eliminating massive N:M cartesian join overhead.
-
----
-
-## Quickstart & Setup Guide
-
-### 1. Prerequisites
-* **Python:** 3.10+
-* **Node.js:** 18+ (Node 20 recommended)
-* **Database:** MySQL 8.0+ running on `127.0.0.1:3306`
+### 4. Pre-Agregasi Titik Tengah Geospasial (*Geolocation Centroids*)
+* Pada data mentah, tabel `geolocation` memuat 1.000.163 data koordinat GPS untuk ~19.000 variasi kode pos unik.
+* *Optimasi:* Membuat tabel agregat terindeks `geolocation_centroids` yang mengelompokkan awalan kode pos dan menghitung rata-rata `AVG(latitude)` serta `AVG(longitude)`. Langkah ini menyusutkan 1 juta baris menjadi 19.015 titik data terindeks, melenyapkan beban *Cartesian join* N:M secara drastis.
 
 ---
 
-### 2. Database Setup
+## Panduan Instalasi & Menjalankan Aplikasi
 
-Create the target database in MySQL:
+### 1. Prasyarat Sistem
+* **Python:** Versi 3.10 atau lebih baru
+* **Node.js:** Versi 18 atau lebih baru (direkomendasikan Node.js 20)
+* **Basis Data:** MySQL Server 8.0+ berjalan pada `127.0.0.1:3306`
+
+---
+
+### 2. Penyiapan Basis Data
+
+Buat basis data target pada MySQL:
 ```sql
 CREATE DATABASE IF NOT EXISTS netcom_ecommerce_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-**Option A — Restore from Database Dump (Recommended & Fastest):**
+**Pilihan A — Restore dari Berkas Dump Database (Direkomendasikan & Tercepat):**
 ```bash
-# On Windows (built-in tar):
+# Pada Windows (menggunakan bawaan tar):
 tar -xzf netcom_ecommerce_dump.sql.gz
-mysql -u <your_username> -p netcom_ecommerce_db < netcom_ecommerce_dump.sql
+mysql -u <username_mysql_anda> -p netcom_ecommerce_db < netcom_ecommerce_dump.sql
 
-# On Linux / macOS:
-gzip -d < netcom_ecommerce_dump.sql.gz | mysql -u <your_username> -p netcom_ecommerce_db
+# Pada Linux / macOS:
+gzip -d < netcom_ecommerce_dump.sql.gz | mysql -u <username_mysql_anda> -p netcom_ecommerce_db
 ```
 
-**Option B — Ingest from Raw CSV Files:**
+**Pilihan B — Ingesti dari Berkas Mentah CSV:**
 ```bash
 cd backend
 python init_db.py
@@ -217,36 +217,36 @@ python init_db.py
 
 ---
 
-### 3. Backend Setup
+### 3. Penyiapan Backend
 
-1. Navigate to the backend directory and install dependencies:
+1. Masuk ke direktori backend dan instal dependensi Python:
    ```bash
    cd backend
    pip install -r requirements.txt
    ```
 
-2. Configure environment variables by copying `.env.example`:
+2. Buat berkas konfigurasi lingkungan dari templat yang tersedia:
    ```bash
    cp .env.example .env
    ```
-   *(On Windows PowerShell: `Copy-Item .env.example .env`)*
+   *(Pada Windows PowerShell: `Copy-Item .env.example .env`)*
 
-   Adjust database credentials in `backend/.env` if your local MySQL settings differ:
+   Sesuaikan kredensial basis data pada `backend/.env` apabila berbeda dengan pengaturan lokal Anda:
    ```ini
    DB_HOST=127.0.0.1
    DB_PORT=3306
    DB_USER=root
-   DB_PASSWORD=your_password
+   DB_PASSWORD=password_mysql_anda
    DB_NAME=netcom_ecommerce_db
-   JWT_SECRET=change-me-in-production-jwt-secret-key
+   JWT_SECRET=rahasia-kunci-jwt-produksi-anda
    PORT=5000
    ```
 
-3. Run the automated test suite to verify database connection and API endpoints:
+3. Jalankan rangkaian pengujian otomatis untuk memverifikasi koneksi database dan API:
    ```bash
    python test_api.py
    ```
-   *Expected output:*
+   *Hasil pengujian yang diharapkan:*
    ```text
    ============================================================
    NETCOM E-COMMERCE ANALYTICS & CRUD API TEST SUITE
@@ -268,70 +268,70 @@ python init_db.py
    ============================================================
    ```
 
-4. Start the backend API server:
+4. Jalankan server API backend:
    ```bash
    python app.py
    ```
-   *Server runs at:* `http://127.0.0.1:5000`
+   *Server backend berjalan di:* `http://127.0.0.1:5000`
 
 ---
 
-### 4. Frontend Setup
+### 4. Penyiapan Frontend
 
-1. Open a new terminal, navigate to the frontend directory, and install packages:
+1. Buka terminal baru, masuk ke direktori frontend, dan pasang seluruh paket dependensi:
    ```bash
    cd frontend
    npm install
    ```
 
-2. Start the development server:
+2. Jalankan server pengembangan Vite:
    ```bash
    npm run dev
    ```
-   *Frontend is live at:* `http://localhost:3000`
+   *Aplikasi web dapat diakses langsung pada:* `http://localhost:3000`
 
-3. *(Optional)* Build for production:
+3. *(Opsional)* Kompilasi untuk kebutuhan rilis produksi:
    ```bash
    npm run build
    ```
 
 ---
 
-## Default Test Accounts
+## Akun Uji Coba Default
 
-| Username | Password | Role | Permissions |
+| Username | Password | Peran (*Role*) | Cakupan Hak Akses |
 | :--- | :--- | :---: | :--- |
-| **`admin`** | `Admin@123` | **`admin`** | Full CRUD, order status modifications, analytics, schema inspection |
-| **`manager`** | `Manager@123` | **`manager`** | Full CRUD, order status modifications, analytics |
-| **`viewer`** | `Viewer@123` | **`viewer`** | Read-only access across all dashboards, charts, and tables |
+| **`admin`** | `Admin@123` | **`admin`** | Akses Penuh: Menambah, mengubah, dan menghapus seluruh tabel CRUD, memperbarui status pesanan, melihat seluruh analitik, dan melihat skema data. |
+| **`manager`** | `Manager@123` | **`manager`** | Akses Operasional: Menambah dan mengubah data CRUD, memperbarui alur status pesanan, dan melihat seluruh analitik. |
+| **`viewer`** | `Viewer@123` | **`viewer`** | Akses Hanya Baca: Hanya dapat melihat metrik, grafik, dan tabel data tanpa izin mengubah data. |
 
 ---
 
-## API Reference
+## Ringkasan Endpoint API
 
-### Authentication (`/api/auth`)
-* `POST /api/auth/login` — Authenticate and receive JWT token + user profile.
-* `GET /api/auth/me` — Inspect current token payload and active role.
-* `GET /api/auth/users` — Administrative user list (Admin only).
+### Autentikasi (`/api/auth`)
+* `POST /api/auth/login` — Autentikasi kredensial pengguna; mengembalikan token JWT dan profil peran.
+* `GET /api/auth/me` — Membaca klaim sesi dan data pengguna yang sedang aktif.
+* `GET /api/auth/users` — Daftar akun pengguna terdaftar (Khusus Admin).
 
-### Universal CRUD Engine (`/api/crud`)
-* `GET /api/crud/datasets` — List all 9 supported dataset entities with record counts.
-* `GET /api/crud/schema/<dataset>` — Inspect column names, data types, and primary keys.
-* `GET /api/crud/<dataset>?page=1&per_page=25&search=...&sort_by=...&sort_order=...` — Paginated and sorted records.
-* `GET /api/crud/<dataset>/<id>` — Fetch a single record by primary key.
-* `POST /api/crud/<dataset>` — Create a new record (Admin/Manager).
-* `PUT /api/crud/<dataset>/<id>` — Update an existing record (Admin/Manager).
-* `DELETE /api/crud/<dataset>/<id>` — Delete a record (Admin only).
+### Mesin CRUD Universal (`/api/crud`)
+* `GET /api/crud/datasets` — Menampilkan daftar 9 tabel dataset beserta jumlah data aktual.
+* `GET /api/crud/schema/<dataset>` — Memeriksa struktur kolom, tipe data, dan primary key tabel.
+* `GET /api/crud/<dataset>?page=1&per_page=25&search=...&sort_by=...&sort_order=...` — Menampilkan data terpaginasi, tersortir, dan terfilter.
+* `GET /api/crud/<dataset>/<id>` — Mengambil satu baris rekaman berdasarkan ID (atau composite key).
+* `POST /api/crud/<dataset>` — Membuat baris rekaman baru (Admin/Manager).
+* `PUT /api/crud/<dataset>/<id>` — Memperbarui data rekaman yang dipilih (Admin/Manager).
+* `DELETE /api/crud/<dataset>/<id>` — Menghapus data rekaman (Khusus Admin).
 
-### Analytics & Fulfillment (`/api/analytics`)
-* `GET /api/analytics/overview` — Executive KPIs (gross revenue, orders, customers, reviews, payment breakdown).
-* `GET /api/analytics/daily-revenue?year=2017&month=11` — Daily time-series revenue and volume data.
-* `GET /api/analytics/anomalies?year=2017&method=zscore&threshold=2.5` — Algorithmic outlier detection register.
-* `GET /api/analytics/unshipped-orders?page=1&page_size=20&status=...` — Fulfillment backlog queue with SLA health.
-* `PATCH /api/analytics/orders/<order_id>/status` — Update order fulfillment state (`shipped`, `delivered`, `canceled`).
+### Analitik & Pemenuhan Pesanan (`/api/analytics`)
+* `GET /api/analytics/overview` — Metrik KPI eksekutif (total omzet, jumlah pesanan, total pembeli, ulasan, persebaran metode pembayaran).
+* `GET /api/analytics/daily-revenue?year=2017&month=11` — Data runtun waktu omzet harian dan volume pesanan.
+* `GET /api/analytics/anomalies?year=2017&method=zscore&threshold=2.5` — Daftar deteksi anomali lonjakan transaksi statistik.
+* `GET /api/analytics/unshipped-orders?page=1&page_size=20&status=...` — Antrean operasional pesanan tertunda lengkap dengan metrik latensi SLA.
+* `PATCH /api/analytics/orders/<order_id>/status` — Memperbarui tahapan siklus pesanan (`shipped`, `delivered`, `canceled`).
 
 ---
 
-## Testing & Tooling
-* **Automated Test Suite:** Run `python backend/test_api.py` to run the 10-point assertion suite.
-* **Postman Collection:** Import [backend/netcom_api_collection.postman_collection.json](backend/netcom_api_collection.postman_collection.json) (v2.1.0) with automated token extraction into Postman. See [backend/README_API.md](backend/README_API.md) for usage instructions.
+## Pengujian & Perangkat Bantu
+* **Rangkaian Pengujian Otomatis:** Eksekusi perintah `python backend/test_api.py` untuk menjalankan 10 skenario pengujian endpoint backend secara komprehensif.
+* **Koleksi Postman:** Impor berkas [backend/netcom_api_collection.postman_collection.json](backend/netcom_api_collection.postman_collection.json) (v2.1.0) ke aplikasi Postman untuk pengujian instan dengan mekanisme *auto-token capture*. Rincian panduan penggunaan dapat dibaca pada [backend/README_API.md](backend/README_API.md).
